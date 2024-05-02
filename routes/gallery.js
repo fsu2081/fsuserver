@@ -1,25 +1,26 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const Gallery = require("../model/Gallery");
-const galleryController = require("../controllers/galleryController")
+const multer = require('multer');
+const path = require('path');
+const Gallery = require('../model/Gallery');
+const galleryController = require('../controllers/galleryController');
 
 //storage
 const storage = multer.diskStorage({
-    destination: "uploads/gallery",
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + file.originalname);
-    },
+  destination: 'uploads/gallery',
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + file.originalname);
+  },
 });
 
 const upload = multer({
-    storage: storage,
+  storage: storage,
 });
 
-router.post("/", upload.array("files"), galleryController.addNewGallery);
-router.get("/", galleryController.getAllGallery);
-router.get("/:id", galleryController.getGalleryById);
-router.post("/:id", upload.array("files"), galleryController.updateGallery);
+router.post('/', upload.array('files'), galleryController.addNewGallery);
+router.get('/', galleryController.getAllGallery);
+router.get('/:id', galleryController.getGalleryById);
+router.post('/:id', upload.array('files'), galleryController.updateGallery);
+router.delete('/:id', galleryController.deleteGallery);
 
 module.exports = router;

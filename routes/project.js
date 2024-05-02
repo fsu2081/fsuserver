@@ -34,4 +34,6 @@ router.get('/', projectController.getAllProjects);
 // Get a project by ID
 router.get('/:id', projectController.getProjectById);
 
+router.delete('/:id', projectController.deleteProject);
+
 module.exports = router;

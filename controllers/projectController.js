@@ -79,4 +79,19 @@ const getProjectById = async (req, res) => {
   }
 };
 
-module.exports = { handleNewProject, getAllProjects, getProjectById };
+const deleteProject = async (req, res) => {
+  // console.log(req.params.id);
+  try {
+    const project = await Project.deleteOne({ _id: req.params.id });
+    res.status(200).json(project);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = {
+  handleNewProject,
+  getAllProjects,
+  getProjectById,
+  deleteProject,
+};
