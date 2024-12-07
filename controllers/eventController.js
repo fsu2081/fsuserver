@@ -1,115 +1,62 @@
-const Event = require('../model/Event');
+const Event = require("../model/Event");
 
-const handleNewEvent = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
-
-  const title = req.body.title;
-  const content = req.body.content;
-  const image = req.file;
-  const registration = req.body.registration;
-  const facebook = req.body.facebook;
-  const date = req.body.date;
-
-  let imageUrl;
-  if (image) {
-    imageUrl = image.destination + '/' + image.filename;
-  }
-
-  if (!title) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Title is a required field',
-    });
-  }
+exports.createEvent = async (req, res) => {
   try {
-    const result = await Event.create({
-      title: title,
-      image: imageUrl,
-      content: content,
-      registration: registration,
-      facebook: facebook,
-      date: date,
-    });
-    return res
-      .status(201)
-      .json({ status: 'success', message: 'New Event is published' });
+    // Destructure and validate the required fields
+    const { title, content, registration, facebook, event_date } = req.body;
+    const file = req.file;
+    const thumbnail_url = file.destination + "/" + file.filename;
+    if (
+      !title ||
+      !content ||
+      !registration ||
+      !facebook ||
+      !event_date ||
+      !thumbnail_url
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "All fields (title, content, registration, facebook, event_date) are required",
+      });
+    }
+
+    const formData = {
+      title,
+      content,
+      registration,
+      facebook,
+      date: event_date,
+      thumbnail_url,
+    };
+
+    const event = new Event(formData);
+    const savedEvent = await event.save();
+    res.status(201).json({ status: "success", data: savedEvent });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ status: "error", message: error.message });
   }
 };
 
-// const getAllEvent = async (req, res) => {
-//   const { page = 1, limit = 5 } = req.query;
-//   const currentDate = new Date();
-//   try {
-//     let allEvents;
-//     if (req.query.page == 'all') {
-//       allEvents = await Event.find();
-//       res.status(200).json(allEvents);
-//     } else {
-//       allEvents = await Event.paginate(
-//         {},
-//         { page, limit, sort: { createdAt: -1 } }
-//       );
-//       const upcomingEvents = allEvents?.docs?.filter(
-//         (event) => new Date(event.date) > currentDate
-//       );
-//       const pastEvents = allEvents?.docs?.filter(
-//         (event) => new Date(event.date) <= currentDate
-//       );
-
-//       // Paginate past events
-//       const paginatedPastEvents = pastEvents.slice(
-//         (page - 1) * limit,
-//         page * limit
-//       );
-
-//       res.status(200).json({
-//         upcomingEvents,
-//         pastEvents: paginatedPastEvents,
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-const getAllEvent = async (req, res) => {
+exports.getAllEvents = async (req, res) => {
   try {
-    const { limit, offset } = req.query;
-
-    // Fetch upcoming events
-    const upcomingEvents = await Event.find({ date: { $gte: new Date() } })
-      .sort({ date: 1 }) // Sort by ascending date
-      // .skip(parseInt(offset))
-      .limit(parseInt(limit) * 8);
-
-    // Fetch past events
-    const pastEvents = await Event.find({ date: { $lt: new Date() } })
-      .sort({ date: -1 }) // Sort by descending date
-      // .skip(parseInt(offset))
-      .limit(parseInt(limit) * 8);
-
-    // Combine and send the response
-    res.json({
-      upcomingEvents,
-      pastEvents,
-    });
+    const events = await Event.find();
+    res.status(200).json({ status: "success", data: events });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ status: "error", message: error.message });
   }
 };
 
-const getSingleEvent = async (req, res) => {
-  console.log(req.params.id);
+exports.getEventById = async (req, res) => {
   try {
-    const event = await Event.findOne({ _id: req.params.id });
-    res.status(200).json(event);
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Event not found" });
+    }
+    res.status(200).json({ status: "success", data: event });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ status: "error", message: error.message });
   }
 };
-
-module.exports = { handleNewEvent, getAllEvent, getSingleEvent };
