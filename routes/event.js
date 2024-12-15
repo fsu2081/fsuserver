@@ -1,19 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const eventController = require('../controllers/eventController');
+const eventController = require("../controllers/eventController");
 
-const multer = require('multer');
+const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === 'image') {
-      cb(null, 'uploads/event');
+    if (file.fieldname === "thumbnail_url") {
+      cb(null, "uploads/event");
     } else {
-      cb(new Error('Invalid fieldname'));
+      cb(new Error("Invalid fieldname"));
     }
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
@@ -25,8 +25,8 @@ const upload = multer({
   },
 });
 
-router.post('/', upload.single('image'), eventController.handleNewEvent);
-router.get('/', eventController.getAllEvent);
-router.get('/:id', eventController.getSingleEvent);
+router.post("/", upload.single("thumbnail_url"), eventController.createEvent);
+router.get("/", eventController.getAllEvents);
+router.get("/:id", eventController.getEventById);
 
 module.exports = router;

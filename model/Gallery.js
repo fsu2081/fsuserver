@@ -1,15 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const gallerySchema = new Schema({
-    event: {
-        type: String,
-        required: true,
+const gallerySchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
     },
-    images: {
-        type: [String],
-        required: true,
+    event_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
     },
-}, { timestamps: true });
+    description: { type: String, default: "" },
+    thumbnail_url: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+// gallerySchema.index({ event_id: 1 });
 
 module.exports = mongoose.model("Gallery", gallerySchema);

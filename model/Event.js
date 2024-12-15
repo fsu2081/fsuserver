@@ -1,27 +1,17 @@
-const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 const Schema = mongoose.Schema;
 
 const eventSchema = new Schema(
   {
-    title: {
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    registration: { type: String, required: true },
+    facebook: { type: String, required: true },
+    date: { type: Date, required: true },
+    thumbnail_url: {
       type: String,
       required: true,
-    },
-    image: {
-      type: String,
-    },
-    content: {
-      type: String,
-    },
-    registration: {
-      type: String,
-    },
-    facebook: {
-      type: String,
-    },
-    date: {
-      type: Date,
     },
   },
   { timestamps: true }
@@ -29,4 +19,4 @@ const eventSchema = new Schema(
 
 eventSchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model('Event', eventSchema);
+module.exports = mongoose.model("Event", eventSchema);
